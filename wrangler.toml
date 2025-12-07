@@ -1,0 +1,27 @@
+# Archivo: wrangler.toml
+
+# Configuración básica del proyecto
+name = "dogencode-frontend" # Cambia esto por el nombre real de tu proyecto
+type = "javascript"
+
+# Configuración específica de Cloudflare Pages Build
+[pages]
+# Esta sección es la clave para solucionar tu error.
+
+# 1. Directorio raíz del proyecto (donde se encuentra package.json)
+# Si tu frontend está dentro de una carpeta llamada 'frontend'
+# dentro de tu repositorio, debes cambiar el 'root' a 'frontend'.
+# Si package.json está en la raíz del repo, puedes dejarlo como '.'
+#
+# **AJUSTA ESTO SEGÚN TU ESTRUCTURA:**
+root = "." 
+
+# 2. Comando para la compilación
+# Debe coincidir con el comando que configuraste en el panel de Cloudflare.
+build_command = "npm run build"
+
+# 3. Directorio de salida (donde el comando 'build' deja los archivos estáticos)
+# Esto es generalmente 'dist' o 'build'.
+#
+# **AJUSTA ESTO TAMBIÉN:**
+build_output_dir = "dist"
