@@ -1,0 +1,23 @@
+{
+  "name": "dogencode-frontend-app",
+  "version": "1.0.0",
+  "description": "Configuración base para Cloudflare Pages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vite build"
+  },
+  "keywords": [
+    "cloudflare",
+    "frontend",
+    "vite"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
