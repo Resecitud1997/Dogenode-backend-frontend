@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DogeNode Bandwidth - Genera y Vende Ancho de Banda por Dogecoin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+        
+        .bandwidth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 1s ease;
+        }
+        
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(118, 75, 162, 0.8);
+            }
+        }
+        
+        .glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .download-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .download-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    
+    <!-- Confetti Container -->
+    <canvas id="confettiCanvas" class="confetti-container"></canvas>
+    
+    <!-- Header -->
+    <header class="bg-white bg-opacity-10 backdrop-blur-md shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-wifi text-white text-3xl"></i>
+                    <h1 class="text-2xl font-bold text-white">DogeNode Bandwidth</h1>
+                    <span class="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold">REAL</span>
+                </div>
+                <button onclick="openExtension()" class="px-6 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-opacity-90 transition">
+                    <i class="fas fa-puzzle-piece mr-2"></i>
+                    Instalar Extensión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-5xl font-bold text-white mb-4">
+                Genera Ancho de Banda y Véndelo por <span class="text-yellow-300">Dogecoin Real</span>
+            </h2>
+            <p class="text-xl text-white opacity-90 mb-8">
+                Comparte tu conexión, genera archivos portables y gana DOGE por cada GB vendido
+            </p>
+            <div class="flex gap-4 justify-center">
+                <div class="px-6 py-3 bg-white bg-opacity-20 backdrop-blur-md rounded-lg">
+                    <p class="text-white text-sm">Ancho de Banda Generado</p>
+                    <p class="text-3xl font-bold text-white" id="totalBandwidth">0 GB</p>
+                </div>
+                <div class="px-6 py-3 bg-white bg-opacity-20 backdrop-blur-md rounded-lg">
+                    <p class="text-white text-sm">Archivos Descargados</p>
+                    <p class="text-3xl font-bold text-white" id="totalFiles">0</p>
+                </div>
+                <div class="px-6 py-3 bg-white bg-opacity-20 backdrop-blur-md rounded-lg">
+                    <p class="text-white text-sm">DOGE Ganados</p>
+                    <p class="text-3xl font-bold text-yellow-300" id="totalDoge">0.00</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bandwidth Generator -->
+        <div class="bandwidth-card rounded-3xl p-8 mb-8 glow">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-magic text-purple-600 mr-3"></i>
+                Generador de Ancho de Banda
+            </h3>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Cantidad de Ancho de Banda</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="bandwidthAmount" value="10" min="1" max="100" 
+                               class="flex-1 px-4 py-3 border-2 border-purple-300 rounded-lg focus:border-purple-600 focus:outline-none text-lg">
+                        <select id="bandwidthUnit" class="px-4 py-3 border-2 border-purple-300 rounded-lg focus:border-purple-600 focus:outline-none">
+                            <option value="MB">MB</option>
+                            <option value="GB" selected>GB</option>
+                            <option value="TB">TB</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">Velocidad (Mbps)</label>
+                    <input type="number" id="bandwidthSpeed" value="100" min="10" max="1000" 
+                           class="w-full px-4 py-3 border-2 border-purple-300 rounded-lg focus:border-purple-600 focus:outline-none text-lg">
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 font-bold mb-2">Nombre del Paquete</label>
+                <input type="text" id="packageName" placeholder="Mi-Ancho-de-Banda" 
+                       class="w-full px-4 py-3 border-2 border-purple-300 rounded-lg focus:border-purple-600 focus:outline-none text-lg">
+            </div>
+
+            <button onclick="generateBandwidth()" 
+                    class="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xl font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-lg">
+                <i class="fas fa-cogs mr-2"></i>
+                Generar Ancho de Banda
+            </button>
+        </div>
+
+        <!-- Download Options -->
+        <div id="downloadSection" class="bandwidth-card rounded-3xl p-8 mb-8 hidden">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-download text-green-600 mr-3"></i>
+                Descargar Archivo de Ancho de Banda
+            </h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <button onclick="downloadFile('windows')" class="download-btn p-6 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fab fa-windows text-4xl mb-2"></i>
+                    <p class="font-bold">Windows</p>
+                    <p class="text-sm opacity-80">.VBS</p>
+                </button>
+                
+                <button onclick="downloadFile('linux')" class="download-btn p-6 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fab fa-linux text-4xl mb-2"></i>
+                    <p class="font-bold">Linux</p>
+                    <p class="text-sm opacity-80">.SH</p>
+                </button>
+                
+                <button onclick="downloadFile('mac')" class="download-btn p-6 bg-gray-700 hover:bg-gray-800 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fab fa-apple text-4xl mb-2"></i>
+                    <p class="font-bold">macOS</p>
+                    <p class="text-sm opacity-80">.SH</p>
+                </button>
+                
+                <button onclick="downloadFile('android')" class="download-btn p-6 bg-green-500 hover:bg-green-600 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fab fa-android text-4xl mb-2"></i>
+                    <p class="font-bold">Android</p>
+                    <p class="text-sm opacity-80">.APK</p>
+                </button>
+
+                <button onclick="downloadFile('ios')" class="download-btn p-6 bg-gray-800 hover:bg-gray-900 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fab fa-apple text-4xl mb-2"></i>
+                    <p class="font-bold">iOS</p>
+                    <p class="text-sm opacity-80">.IPA</p>
+                </button>
+
+                <button onclick="downloadFile('ubuntu')" class="download-btn p-6 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fab fa-ubuntu text-4xl mb-2"></i>
+                    <p class="font-bold">Ubuntu</p>
+                    <p class="text-sm opacity-80">.DEB</p>
+                </button>
+
+                <button onclick="downloadFile('chrome')" class="download-btn p-6 bg-red-500 hover:bg-red-600 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fab fa-chrome text-4xl mb-2"></i>
+                    <p class="font-bold">Chrome OS</p>
+                    <p class="text-sm opacity-80">.CRX</p>
+                </button>
+
+                <button onclick="downloadFile('universal')" class="download-btn p-6 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition transform hover:scale-105">
+                    <i class="fas fa-globe text-4xl mb-2"></i>
+                    <p class="font-bold">Universal</p>
+                    <p class="text-sm opacity-80">.ZIP</p>
+                </button>
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Información:</strong> El archivo contiene <span id="fileSize">0</span> de ancho de banda utilizable.
+                    Válido por <strong>30 días</strong> desde la descarga.
+                </p>
+            </div>
+        </div>
+
+        <!-- Progress to Goals -->
+        <div class="bandwidth-card rounded-3xl p-8 mb-8">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-trophy text-yellow-500 mr-3"></i>
+                Progreso a Metas Globales
+            </h3>
+
+            <div id="milestones">
+                <!-- Milestones se generarán dinámicamente -->
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="bandwidth-card rounded-3xl p-8">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                ¿Cómo Funciona?
+            </h3>
+            
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
+                    <h4 class="font-bold text-gray-800 mb-2">Genera</h4>
+                    <p class="text-gray-600 text-sm">Crea paquetes de ancho de banda configurables</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
+                    <h4 class="font-bold text-gray-800 mb-2">Descarga</h4>
+                    <p class="text-gray-600 text-sm">Obtén el archivo para tu plataforma favorita</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
+                    <h4 class="font-bold text-gray-800 mb-2">Usa</h4>
+                    <p class="text-gray-600 text-sm">Ejecuta el archivo en tu dispositivo para obtener ancho de banda</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-yellow-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
+                    <h4 class="font-bold text-gray-800 mb-2">Gana</h4>
+                    <p class="text-gray-600 text-sm">Vende tu ancho de banda y recibe Dogecoin real</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Progress Bar -->
+    <footer class="bg-white bg-opacity-10 backdrop-blur-md mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="mb-4">
+                <div class="flex justify-between text-white text-sm mb-2">
+                    <span>Meta Global: 500,000,000 GB</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="w-full bg-white bg-opacity-20 rounded-full h-4 overflow-hidden">
+                    <div id="globalProgress" class="progress-bar h-full rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+            <p class="text-center text-white text-sm">
+                &copy; 2024 DogeNode Bandwidth. Sistema revolucionario de generación y venta de ancho de banda.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/bandwidth-generator.js"></script>
+    <script src="js/progress-tracker.js"></script>
+</body>
+</html>
