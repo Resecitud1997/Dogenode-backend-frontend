@@ -4,7 +4,7 @@ detectBackendURL() {
     }
     
     // URL de producción
-    return 'https://tu-backend.herokuapp.com';
+    return 'https://Resecitud1997.github.io/dogenode-real/';
 }
 ```
 
