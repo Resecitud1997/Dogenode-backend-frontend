@@ -9,4 +9,4 @@ compatibility_date = "2025-12-08"
 [site]
 # El directorio donde el comando de compilación (npm run build) 
 # dejará todos los archivos estáticos.
-bucket = "frontend"
+bucket = "frontend/build"
