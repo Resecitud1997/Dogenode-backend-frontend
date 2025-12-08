@@ -1,0 +1,12 @@
+# Archivo: wrangler.toml
+
+# Configuración del Worker
+name = "dogencode-backend-01" 
+main = "frontend/build/index.js" # Ruta ficticia, no importa mucho aquí
+compatibility_date = "2025-12-08"
+
+# 🌟 SECCIÓN CLAVE PARA EL FRONTEND ESTÁTICO 🌟
+[site]
+# El directorio donde el comando de compilación (npm run build) 
+# dejará todos los archivos estáticos.
+bucket = "frontend"
